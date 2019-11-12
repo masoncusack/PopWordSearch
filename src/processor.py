@@ -6,6 +6,7 @@ from collections import Counter
 #I think we'll need to go back and re-process if we need all sentences where the common words occur.
 #TODO: best way to output as table?
 #TODO: write tests and consider CI/CD. In fact, consider deploying this as a site/API
+#TODO: setup.sh bash script that does e.g. python3 -m spacy download en (or whatever it was)
 
 #Open test doc 1
 doc = open('../test_docs/doc1.txt')
