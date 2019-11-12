@@ -1,16 +1,21 @@
 import spacy
 from collections import Counter
+import re #regex
 
-#TODO: take out stop words so we don't capture "the"
+#TODO: take out new lines '\n'
+
+#Open test doc 1
+doc = open('../test_docs/doc1.txt')
+
 #How many top common words would you like to find?
-num_common_words = 1
+num_common_words = 10
 
 nlp = spacy.load('en')
 
-doc = nlp(u'Hello there, how are you? Hello hello hello')
+doc = nlp(doc.read())
 
-#Find words/"tokens"
-words = [token.text for token in doc if token.is_punct != True]
+#Find words/"tokens", removing stop words
+words = [token.text for token in doc if token.is_punct != True and token.is_stop != True]
 
 #Find the n most common words
 num_words = Counter(words)
