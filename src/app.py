@@ -4,7 +4,7 @@ import json
 import zipfile
 from flask import Flask, request, Response, flash, redirect, render_template
 from werkzeug.utils import secure_filename
-import os
+import shutil, os
 
 #TODO: How do we want to handle keeping track of sentences? Go back in and retrieve them or can we track them from the beginning?
 #I think we'll need to go back and re-process if we need all sentences where the common words occur.
@@ -18,7 +18,7 @@ ADDRESS = '0.0.0.0'
 PORT = 8000
 
 #Path to upload folder
-UPLOAD_FOLDER = '../test_docs'
+UPLOAD_FOLDER = '../uploads/'
 
 # Restrict extensions
 ALLOWED_EXTENSIONS = {'zip'}  # restrict to .zip upload for now
@@ -43,16 +43,29 @@ def handle_file_upload():
             flash('Filename missing')
             return redirect(request.url)
         if files and allowed_file(files.filename): #check that is not None
-            filename = secure_filename(files.filename)
-            print("\nUploaded filename: " + str(filename))
-            #TODO: safe zip file locally for to test_docs for analysis
-            files.save(os.path.join(UPLOAD_FOLDER, filename))
-            #TODO: unzip all contained files to get txts
-            #TODO: delete all files in test_docs once the result is returned
+            zipname = secure_filename(files.filename)
+            print("\nUploaded filename: " + str(zipname))
+            #Save files locally for processing
+            files.save(os.path.join(UPLOAD_FOLDER, zipname))
+            #Unzip all contained files to get txts
+            zip_ref = zipfile.ZipFile(UPLOAD_FOLDER+zipname, 'r')
+            outpath = '../txt_files/' #txts in here
+            zip_ref.extractall(outpath)
+            zip_ref.close()
+            #Remove containing folder & copy files to generic txt directory for processing
+            source_dir = outpath+zipname.rsplit('.', 1)[0]+'/'
+            file_list = os.listdir(source_dir)
+            file_paths = [source_dir+filename for filename in file_list]
+            for f in file_paths:
+                shutil.copy2(f, outpath)
+            #TODO: Cleanup
+            shutil.rmtree(UPLOAD_FOLDER)
+            shutil.rmtree(source_dir)
 
     return render_template('index.html')
 
-#Open test doc 1
+''' TODO: process docs as below to find the most popular words
+#Open test doc 1 
 doc = open('../test_docs/doc1.txt')
 plaintext = doc.read().replace('\n', '') #strip out newline characters common in .txts
 
@@ -72,8 +85,9 @@ num_words = Counter(words)
 common_words = num_words.most_common(num_common_words)
 
 print(common_words)
+'''
 
-#Convert to json for response (can be rendered in table on front end)
+#Convert result to json for response (can be rendered in table on front end)
 #TODO: the below needs to be generated for each popular word
 def gen_response():
     response_data_entry = {
