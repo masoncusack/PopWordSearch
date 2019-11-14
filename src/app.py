@@ -27,6 +27,12 @@ ALLOWED_EXTENSIONS = {'zip'}  # restrict to .zip upload for now
 # Initialize app:
 app = Flask(__name__)
 
+def create_dir(path):
+    if not os.path.isdir(path):
+        os.mkdir(path)
+
+create_dir(UPLOAD_FOLDER)
+
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
@@ -50,6 +56,7 @@ def handle_file_upload():
             #Unzip all contained files to get txts
             zip_ref = zipfile.ZipFile(UPLOAD_FOLDER+zipname, 'r')
             outpath = '../txt_files/' #txts in here
+            create_dir(outpath)
             zip_ref.extractall(outpath)
             zip_ref.close()
             #Remove containing folder & copy files to generic txt directory for processing
