@@ -4,8 +4,8 @@ import json
 import zipfile
 from flask import Flask, request, Response, flash, redirect, render_template
 from werkzeug.utils import secure_filename
+import os
 
-#TODO: Do we want to process all documents or one by one? Surely all together become less instructive.
 #TODO: How do we want to handle keeping track of sentences? Go back in and retrieve them or can we track them from the beginning?
 #I think we'll need to go back and re-process if we need all sentences where the common words occur.
 #TODO: best way to output as table?
@@ -17,9 +17,12 @@ from werkzeug.utils import secure_filename
 ADDRESS = '0.0.0.0'
 PORT = 8000
 
+#Path to upload folder
+UPLOAD_FOLDER = '../test_docs'
+
 # Restrict extensions
 ALLOWED_EXTENSIONS = {'zip'}  # restrict to .zip upload for now
-# ALLOWED_EXTENSIONS = {'txt', 'jpg', 'jpeg', 'png', 'tiff'} #Can always extend to other files (for processing in transit)
+# ALLOWED_EXTENSIONS = {'txt', 'jpg', 'png'} #Can always extend to other filetypes later
 
 # Initialize app:
 app = Flask(__name__)
@@ -42,7 +45,10 @@ def handle_file_upload():
         if files and allowed_file(files.filename): #check that is not None
             filename = secure_filename(files.filename)
             print("\nUploaded filename: " + str(filename))
-        #TODO: unzip files and save them locally for to test_docs for analysis, then delete them once the result is returned
+            #TODO: safe zip file locally for to test_docs for analysis
+            files.save(os.path.join(UPLOAD_FOLDER, filename))
+            #TODO: unzip all contained files to get txts
+            #TODO: delete all files in test_docs once the result is returned
 
     return render_template('index.html')
 
