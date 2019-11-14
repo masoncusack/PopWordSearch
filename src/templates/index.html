@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html style="zoom:200%; max-width:500px; margin:auto">
+    <head>
+        <meta charset="UTF-8">
+        <title>Natural language analysis</title>
+    </head>
+
+    <body style="text-align:center">
+        <h1 style="text-align:center">Upload a .zip folder of .txt files for analysis</h1>
+        <br>
+            <form method="post" action="/" enctype="multipart/form-data">
+                <input type="file" name="zip" id="zip">
+                <br><br>
+                <input type="submit" value="Upload"></form>
+                <br/><br/><hr/>
+            </form>
+        <h3 style="color:black">Results: </h3>
+            <table style="margin-right:auto; margin-left:auto; width:400px;" border="1">
+                <tr>
+                    <th style="color:black">Word(#)</th>
+                    <th style="color:black">Documents</th>
+                    <th style="color:black">Sentences containing the word</th>
+                </tr>
+            </table>
+        </h3>
+    </body>
+</html>
