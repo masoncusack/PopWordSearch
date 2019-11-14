@@ -28,13 +28,30 @@ ALLOWED_EXTENSIONS = {'zip'}  # restrict to .zip upload for now
 app = Flask(__name__)
 
 def create_dir(path):
-    if not os.path.isdir(path):
-        os.mkdir(path)
-
-create_dir(UPLOAD_FOLDER)
+    if os.path.isdir(path):
+        shutil.rmtree(path)
+    
+    os.mkdir(path)
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def unzip(zip_name, in_path, out_path='../txt_files/'):
+    zip_ref = zipfile.ZipFile(in_path, 'r')
+    create_dir(out_path)
+    zip_ref.extractall(out_path)
+    zip_ref.close()
+    
+    #Remove containing folder & copy files to generic txt directory for processing
+    source_dir = out_path+zip_name.rsplit('.', 1)[0]+'/'
+    file_list = os.listdir(source_dir)
+    file_paths = [source_dir+filename for filename in file_list]
+    for f in file_paths:
+        shutil.copy2(f, out_path)
+    
+    #Cleanup
+    shutil.rmtree(UPLOAD_FOLDER)
+    shutil.rmtree(source_dir)
 
 @app.route("/", methods=['GET', 'POST'])
 def handle_file_upload():
@@ -50,24 +67,16 @@ def handle_file_upload():
             return redirect(request.url)
         if files and allowed_file(files.filename): #check that is not None
             zipname = secure_filename(files.filename)
-            print("\nUploaded filename: " + str(zipname))
+            #print("\nUploaded filename: " + str(zipname))
+
+            #Ensure there is an uploads folder
+            create_dir(UPLOAD_FOLDER)
+            
             #Save files locally for processing
             files.save(os.path.join(UPLOAD_FOLDER, zipname))
+            
             #Unzip all contained files to get txts
-            zip_ref = zipfile.ZipFile(UPLOAD_FOLDER+zipname, 'r')
-            outpath = '../txt_files/' #txts in here
-            create_dir(outpath)
-            zip_ref.extractall(outpath)
-            zip_ref.close()
-            #Remove containing folder & copy files to generic txt directory for processing
-            source_dir = outpath+zipname.rsplit('.', 1)[0]+'/'
-            file_list = os.listdir(source_dir)
-            file_paths = [source_dir+filename for filename in file_list]
-            for f in file_paths:
-                shutil.copy2(f, outpath)
-            #TODO: Cleanup
-            shutil.rmtree(UPLOAD_FOLDER)
-            shutil.rmtree(source_dir)
+            unzip(zip_name=zipname, in_path=UPLOAD_FOLDER+zipname) #out_path has default
 
     return render_template('index.html')
 
