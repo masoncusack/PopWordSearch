@@ -24,10 +24,14 @@ UPLOAD_FOLDER = '../uploads/'
 ALLOWED_EXTENSIONS = {'zip'}  # restrict to .zip upload for now
 # ALLOWED_EXTENSIONS = {'txt', 'jpg', 'png'} #Can always extend to other filetypes later
 
-# Initialize app:
+# Initialize app
 app = Flask(__name__)
 
+# Load spaCy's English language model
+nlp = spacy.load('en')
+
 def create_dir(path):
+    #refresh
     if os.path.isdir(path):
         shutil.rmtree(path)
     
@@ -55,53 +59,48 @@ def unzip(zip_name, in_path, out_path='../txt_files/'): #Note: if out_path chang
 
 def find_pop_words(num_common_words=10, file_dir="../txt_files"): #by default search for 10 most common
 
-    #TODO: process docs as below to find the most popular words
-    #Open test doc 1
+    #Get filepaths of uploaded txts
     filepaths = []
     
     for dirname, _, filenames in os.walk(file_dir):
         for filename in filenames:
             filepaths.append(os.path.join(dirname, filename))
 
-    #sort filepaths because for some reason os.walk paths are unordered.
+    # Sort filepaths because for some reason os.walk paths are unordered.
     filepaths.sort()
-    print(filepaths)
 
-    #Maintain ordered list to associate texts with specific files
-    #TODO: use this to understand which docs each occurs in
+    # Maintain ordered list to associate text bodies with specific files
     content_per_doc = []
 
-    #Concat all content to find popular words
+    # Concat all content to find popular words
     full_content = ""
 
     for f in filepaths:
         doc = open(f)
-        plaintext = doc.read().replace('\n', '') #strip out newline characters common in .txts
+        plaintext = doc.read().replace('\n', '') # Strip out newline characters common in .txts
         content_per_doc.append(plaintext)
-        full_content += plaintext+" " #Add spaces to ensure tokens are recognised correctly (spaCy may handle this anyway)
+        full_content += plaintext+" " # Add spaces to ensure tokens are recognised correctly (spaCy may handle this anyway)
 
-    #Process to find common words across documents
-    #Load English language model
-    nlp = spacy.load('en')
-
+    # Process to find common words across documents
     text_to_process = nlp(full_content)
 
-    #Find words/"tokens", removing stop words
+    # Find words/"tokens", removing stop words
     words = [token.text for token in text_to_process if token.is_punct != True and token.is_stop != True]
 
-    #Find the n most common words
+    # Find the n most common words
     num_words = Counter(words)
     common_words = num_words.most_common(num_common_words)
 
     #TODO: return results and use in other processing functions, then wrap
-    return common_words
+    #Return words only, not their count, as we don't need this in any results
+    return [word[0] for word in common_words]
 
 #TODO: find which documents each popular word appears in
-def which_documents(word):
+def which_documents(content_per_doc, word):
     return render_template('index.html')
 
 #TODO: find sentences in which each popular word appears
-def find_sentences(word):
+def find_sentences(full_content, word):
     return render_template('index.html')
 
 @app.route("/", methods=['GET', 'POST'])
@@ -130,6 +129,7 @@ def handle_file_upload():
             unzip(zip_name=zipname, in_path=UPLOAD_FOLDER+zipname) #out_path has default
 
             common_words = find_pop_words()
+            print("Common words: " + str(common_words))
 
     return render_template('index.html')
 
