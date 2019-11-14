@@ -69,20 +69,23 @@ print(common_words)
 
 #Convert to json for response (can be rendered in table on front end)
 #TODO: the below needs to be generated for each popular word
-response_data_entry = {
-    "Word(#)": {
+def gen_response():
+    response_data_entry = {
+        "Word(#)": {
 
-    },
-    "Documents": {
-        
-    },
-    "Sentences containing the word": {
+        },
+        "Documents": {
+            
+        },
+        "Sentences containing the word": {
 
+        }
     }
-}
-
-response_string = json.dumps(response_data_entry)
-print(response_string)
+    
+    response_string = json.dumps(response_data_entry)    
+    print(response_string)
+    
+    return response_string
 
 if __name__ == '__main__':
     app.run(host=ADDRESS, port=PORT) #Run over http for sake of ease (not secure for production)
