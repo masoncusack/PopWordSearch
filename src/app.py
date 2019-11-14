@@ -36,7 +36,7 @@ def create_dir(path):
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-def unzip(zip_name, in_path, out_path='../txt_files/'):
+def unzip(zip_name, in_path, out_path='../txt_files/'): #Note: if out_path changes, so will file_dir in find_pop_words()
     zip_ref = zipfile.ZipFile(in_path, 'r')
     create_dir(out_path)
     zip_ref.extractall(out_path)
@@ -52,6 +52,57 @@ def unzip(zip_name, in_path, out_path='../txt_files/'):
     #Cleanup
     shutil.rmtree(UPLOAD_FOLDER)
     shutil.rmtree(source_dir)
+
+def find_pop_words(num_common_words=10, file_dir="../txt_files"): #by default search for 10 most common
+
+    #TODO: process docs as below to find the most popular words
+    #Open test doc 1
+    filepaths = []
+    
+    for dirname, _, filenames in os.walk(file_dir):
+        for filename in filenames:
+            filepaths.append(os.path.join(dirname, filename))
+
+    #sort filepaths because for some reason os.walk paths are unordered.
+    filepaths.sort()
+    print(filepaths)
+
+    #Maintain ordered list to associate texts with specific files
+    #TODO: use this to understand which docs each occurs in
+    content_per_doc = []
+
+    #Concat all content to find popular words
+    full_content = ""
+
+    for f in filepaths:
+        doc = open(f)
+        plaintext = doc.read().replace('\n', '') #strip out newline characters common in .txts
+        content_per_doc.append(plaintext)
+        full_content += plaintext+" " #Add spaces to ensure tokens are recognised correctly (spaCy may handle this anyway)
+
+    #Process to find common words across documents
+    #Load English language model
+    nlp = spacy.load('en')
+
+    text_to_process = nlp(full_content)
+
+    #Find words/"tokens", removing stop words
+    words = [token.text for token in text_to_process if token.is_punct != True and token.is_stop != True]
+
+    #Find the n most common words
+    num_words = Counter(words)
+    common_words = num_words.most_common(num_common_words)
+
+    #TODO: return results and use in other processing functions, then wrap
+    return common_words
+
+#TODO: find which documents each popular word appears in
+def which_documents(word):
+    return render_template('index.html')
+
+#TODO: find sentences in which each popular word appears
+def find_sentences(word):
+    return render_template('index.html')
 
 @app.route("/", methods=['GET', 'POST'])
 def handle_file_upload():
@@ -78,30 +129,9 @@ def handle_file_upload():
             #Unzip all contained files to get txts
             unzip(zip_name=zipname, in_path=UPLOAD_FOLDER+zipname) #out_path has default
 
+            common_words = find_pop_words()
+
     return render_template('index.html')
-
-''' TODO: process docs as below to find the most popular words
-#Open test doc 1 
-doc = open('../test_docs/doc1.txt')
-plaintext = doc.read().replace('\n', '') #strip out newline characters common in .txts
-
-#How many top common words would you like to find?
-num_common_words = 10
-
-#Load English language model
-nlp = spacy.load('en')
-
-doc = nlp(plaintext) #Take out new lines
-
-#Find words/"tokens", removing stop words
-words = [token.text for token in doc if token.is_punct != True and token.is_stop != True]
-
-#Find the n most common words
-num_words = Counter(words)
-common_words = num_words.most_common(num_common_words)
-
-print(common_words)
-'''
 
 #Convert result to json for response (can be rendered in table on front end)
 #TODO: the below needs to be generated for each popular word
