@@ -85,6 +85,7 @@ def find_pop_words(num_common_words=10, file_dir="../txt_files"): #by default se
     text_to_process = nlp(full_content)
 
     # Find words/"tokens", removing stop words
+    #TODO: turn tokens to lowercase to avoid duplication of results, e.g. let
     words = [token.text for token in text_to_process if token.is_punct != True and token.is_stop != True]
 
     # Find the n most common words
