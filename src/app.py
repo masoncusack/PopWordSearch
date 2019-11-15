@@ -117,7 +117,6 @@ def handle_file_upload():
             return redirect(request.url)
         if files and allowed_file(files.filename): #check that is not None
             zipname = secure_filename(files.filename)
-            #print("\nUploaded filename: " + str(zipname))
 
             #Ensure there is an uploads folder
             create_dir(UPLOAD_FOLDER)
@@ -128,7 +127,13 @@ def handle_file_upload():
             #Unzip all contained files to get txts
             unzip(zip_name=zipname, in_path=UPLOAD_FOLDER+zipname) #out_path has default
 
-            common_words = find_pop_words()
+            #If the user submits a specific number of common words they want
+            if request.form['num_common_words'] is not None:
+                num_common_words = request.form['num_common_words']
+                common_words = find_pop_words(num_common_words=int(num_common_words))
+            else:
+                common_words = find_pop_words() #use default
+            
             print("Common words: " + str(common_words))
 
     return render_template('index.html')
@@ -149,7 +154,7 @@ def gen_response():
     }
     
     response_string = json.dumps(response_data_entry)    
-    print(response_string)
+    #print(response_string)
     
     return response_string
 
