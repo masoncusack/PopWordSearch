@@ -128,6 +128,7 @@ def handle_file_upload():
             unzip(zip_name=zipname, in_path=UPLOAD_FOLDER+zipname) #out_path has default
 
             #If the user submits a specific number of common words they want
+            #TODO: protect against the case when num_common_words is negative
             if request.form['num_common_words'] is not None:
                 num_common_words = request.form['num_common_words']
                 common_words = find_pop_words(num_common_words=int(num_common_words))
