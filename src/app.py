@@ -61,32 +61,40 @@ def find_pop_words(num_common_words=10, file_dir="../txt_files"): #by default se
 
     #Get filepaths of uploaded txts
     filepaths = []
+    f_names = []
     
     for dirname, _, filenames in os.walk(file_dir):
-        for filename in filenames:
-            filepaths.append(os.path.join(dirname, filename))
+        f_names = filenames
+        filepaths = [os.path.join(dirname, filename) for filename in filenames]
 
     # Sort filepaths because for some reason os.walk paths are unordered.
     filepaths.sort()
+    f_names.sort()
 
-    # Maintain ordered list to associate text bodies with specific files
-    content_per_doc = []
+    # Dict to associating text body to each individual file
+    content_per_doc = {}
 
     # Concat all content to find popular words
     full_content = ""
 
-    for f in filepaths:
-        doc = open(f)
+    for i in range(len(filepaths)):
+        filename = f_names[i]
+        print("Filename = " + str(filename))
+        print("Filepath = " + str(filepaths[i]))
+        doc = open(filepaths[i])
         plaintext = doc.read().replace('\n', '') # Strip out newline characters common in .txts
-        content_per_doc.append(plaintext)
+        
+        #Add content as value to dict with filename as key
+        content_per_doc[filename] = plaintext
+        
+        #Assemble raw content from all docs
         full_content += plaintext+" " # Add spaces to ensure tokens are recognised correctly (spaCy may handle this anyway)
 
     # Process to find common words across documents
     text_to_process = nlp(full_content)
 
     # Find words/"tokens", removing stop words
-    #TODO: turn tokens to lowercase to avoid duplication of results, e.g. let
-    words = [token.text for token in text_to_process if token.is_punct != True and token.is_stop != True]
+    words = [str(token.text).lower() for token in text_to_process if token.is_punct != True and token.is_stop != True]
 
     # Find the n most common words
     num_words = Counter(words)
@@ -94,7 +102,7 @@ def find_pop_words(num_common_words=10, file_dir="../txt_files"): #by default se
 
     #TODO: return results and use in other processing functions, then wrap
     #Return words only, not their count, as we don't need this in any results
-    return [word[0] for word in common_words]
+    return [word[0] for word in common_words], full_content, content_per_doc
 
 #TODO: find which documents each popular word appears in
 def which_documents(content_per_doc, word):
@@ -107,14 +115,14 @@ def find_sentences(full_content, pop_words):
 
     sentences = list(text_to_process.sents)
 
-    print("Total num sentences: " + str(len(sentences)))
+    #print("Total num sentences: " + str(len(sentences)))
     #print(sentences)
 
     for word in pop_words:
         hit_sentences = [sent for sent in sentences if word in str(sent)]
-        print("Found the following sentences containing popular word " + str(word) +" in the given content:")
-        print(hit_sentences)
-        print("Number of sentences found: " + str(len(hit_sentences)) + "\n")
+        #print("Found the following sentences containing popular word " + str(word) +" in the given content:")
+        #print(hit_sentences)
+        #print("Number of sentences found: " + str(len(hit_sentences)) + "\n")
 
     #TODO: figure out return format
     return True
@@ -149,7 +157,7 @@ def handle_file_upload():
                 num_common_words = request.form['num_common_words']
                 common_words = find_pop_words(num_common_words=int(num_common_words))
             else:
-                common_words = find_pop_words() #use default
+                common_words, full_content, content_per_doc = find_pop_words() #use default
             
             print("Common words: " + str(common_words))
 
