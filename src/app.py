@@ -154,7 +154,7 @@ def handle_file_upload():
                 num_common_words = request.form['num_common_words']
                 common_words = find_pop_words(num_common_words=int(num_common_words))
             else:
-                common_words, full_content, content_per_doc = find_pop_words() #use default
+                common_words, content_per_doc = find_pop_words() #use default
             
             print("Common words: " + str(common_words))
 
@@ -175,7 +175,7 @@ def gen_response():
         }
     }
     
-    response_string = json.dumps(response_data_entry)    
+    response_string = json.dumps(response_data_entry)
     #print(response_string)
     
     return response_string
