@@ -6,12 +6,9 @@ from flask import Flask, request, Response, flash, redirect, render_template
 from werkzeug.utils import secure_filename
 import shutil, os
 
-#TODO: How do we want to handle keeping track of sentences? Go back in and retrieve them or can we track them from the beginning?
-#I think we'll need to go back and re-process if we need all sentences where the common words occur.
-#TODO: best way to output as table?
 #TODO: write tests and consider CI/CD. In fact, consider deploying this as a site/API
 #TODO: setup.sh bash script that does e.g. python3 -m spacy download en (or whatever it was)
-#TODO: consider support for Mandarin Chinese or another language?
+#TODO: consider support for Mandarin Chinese or another language? (should be transferable)
 
 # Set host and port
 ADDRESS = '0.0.0.0'
@@ -57,6 +54,7 @@ def unzip(zip_name, in_path, out_path='../txt_files/'): #Note: if out_path chang
     shutil.rmtree(UPLOAD_FOLDER)
     shutil.rmtree(source_dir)
 
+#Find the most common words across all documents
 def find_pop_words(num_common_words=10, file_dir="../txt_files"): #by default search for 10 most common
 
     #Get filepaths of uploaded txts
@@ -74,9 +72,6 @@ def find_pop_words(num_common_words=10, file_dir="../txt_files"): #by default se
     # Dict to associating text body to each individual file
     content_per_doc = {}
 
-    # Concat all content to find popular words
-    full_content = ""
-
     for i in range(len(filepaths)):
         filename = f_names[i]
         print("Filename = " + str(filename))
@@ -87,8 +82,9 @@ def find_pop_words(num_common_words=10, file_dir="../txt_files"): #by default se
         #Add content as value to dict with filename as key
         content_per_doc[filename] = plaintext
         
-        #Assemble raw content from all docs
-        full_content += plaintext+" " # Add spaces to ensure tokens are recognised correctly (spaCy may handle this anyway)
+
+    # Concat all content to find popular words across documents
+    full_content = ' '.join(content_per_doc.values())
 
     # Process to find common words across documents
     text_to_process = nlp(full_content)
@@ -102,19 +98,20 @@ def find_pop_words(num_common_words=10, file_dir="../txt_files"): #by default se
 
     #TODO: return results and use in other processing functions, then wrap
     #Return words only, not their count, as we don't need this in any results
-    return [word[0] for word in common_words], content_per_doc
+    return [word[0] for word in common_words], content_per_doc, full_content
 
 # Find which documents each popular word appears in
-def which_documents(content_per_doc, word):
-    hit_docs = [key for key, value in content_per_doc.items() if (word in value)]
+def find_documents(content_per_doc, pop_words):
+    hit_docs = {}
+    for word in pop_words:
+        #values of hit_docs are lists of documents for which the common word key is a part of the content
+        hit_docs[word] = [key for key, value in content_per_doc.items() if (word in value)]
     return hit_docs
 
-# Find sentences a popular word appears in across all documents.
-def find_sentences(content_per_doc, pop_words):
+# Find which sentences a popular word appears in across all documents.
+def find_sentences(full_content, pop_words):
 
-    full_content = ' '.join(content_per_doc.values()) #Concat all text from docs with spaces between
-
-    text_to_process = nlp(full_content) #TODO: need to do this globally
+    text_to_process = nlp(full_content) #TODO: should we do this globally?
 
     sentences = list(text_to_process.sents)
 
@@ -122,7 +119,7 @@ def find_sentences(content_per_doc, pop_words):
 
     #Associate sentences with their contained popular words
     for word in pop_words:
-        hit_sentences[word] = [sent for sent in sentences if word in str(sent)]
+        hit_sentences[word] = [sent for sent in sentences if word in str(sent)] #Values are lists of sentences that associated word is in
 
     return hit_sentences
 
@@ -154,11 +151,17 @@ def handle_file_upload():
             #TODO: protect against the case when num_common_words is negative
             if request.form['num_common_words'] is not None:
                 num_common_words = request.form['num_common_words']
-                common_words = find_pop_words(num_common_words=int(num_common_words))
+                common_words, content_per_doc, full_content = find_pop_words(num_common_words=int(num_common_words))
             else:
-                common_words, content_per_doc = find_pop_words() #use default
+                common_words, content_per_doc, full_content = find_pop_words() #use default
             
-            print("Common words: " + str(common_words))
+            print("Most common words: " + str(common_words))
+
+            hit_sentences = find_sentences(full_content, common_words) #common_words are a set of keys for this dict
+            
+            print("Sentences with these words: " + str(hit_sentences))
+
+            hit_docs = find_documents(content_per_doc, common_words)
 
     return render_template('index.html')
 
