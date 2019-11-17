@@ -74,10 +74,10 @@ def find_pop_words(num_common_words=10, file_dir="../txt_files"): #by default se
 
     for i in range(len(filepaths)):
         filename = f_names[i]
-        print("Filename = " + str(filename))
-        print("Filepath = " + str(filepaths[i]))
+        #print("Filename = " + str(filename))
+        #print("Filepath = " + str(filepaths[i]))
         doc = open(filepaths[i])
-        plaintext = doc.read().replace('\n', '') # Strip out newline characters common in .txts
+        plaintext = doc.read().replace('\n', '').lower() # Strip out newline characters common in .txts and turn to lowercase to avoid token duplication
         
         #Add content as value to dict with filename as key
         content_per_doc[filename] = plaintext
@@ -90,7 +90,7 @@ def find_pop_words(num_common_words=10, file_dir="../txt_files"): #by default se
     text_to_process = nlp(full_content)
 
     # Find words/"tokens", removing stop words
-    words = [str(token.text).lower() for token in text_to_process if token.is_punct != True and token.is_stop != True]
+    words = [str(token.text) for token in text_to_process if token.is_punct != True and token.is_stop != True]
 
     # Find the n most common words
     num_words = Counter(words)
@@ -119,7 +119,7 @@ def find_sentences(full_content, pop_words):
 
     #Associate sentences with their contained popular words
     for word in pop_words:
-        hit_sentences[word] = [str(sent) for sent in sentences if word in str(sent)] #Values are lists of sentences that associated word is in
+        hit_sentences[str(word).lower()] = [str(sent) for sent in sentences if word in str(sent)] #Values are lists of sentences that associated word is in
 
     return hit_sentences
 
@@ -171,17 +171,22 @@ def handle_file_upload():
 
             #4. Aggregate into response object (key for each result dict is the common word itself)
 
-            '''Example result entry'''
+            #Example result entry
             print("Common word: ")
-            sought_word = common_words[0]
+            sought_word = common_words[1]
+            print(sought_word)
             
             print("\nDocuments where this word appears: ")
             print(hit_docs[sought_word])
 
             print("\nSentences where this word appears: ")
             print(hit_sentences[sought_word])
-
-            #TODO: jsonify
+            
+            '''TODO: jsonify
+            for word in common_words:
+                response = gen_response(word, hit_docs[word], hit_sentences[word]) 
+                print(response)
+            '''
             
 
     return render_template('index.html')
@@ -189,20 +194,14 @@ def handle_file_upload():
 #Convert result to json for response (can be rendered in table on front end)
 #TODO: the below needs to be generated for each popular word
 def gen_response(common_word, hit_documents, hit_sentences):
-    response_data_entry = {
-        "Word(#)": {
-            common_word
-        },
-        "Documents": {
-            hit_documents
-        },
-        "Sentences containing the word": {
-            hit_sentences
-        }
-    }
     
+    response_data_entry = [{
+        "word(#)": {"word": common_word},
+        "Documents": {"document": common_word},
+        "Sentences containing the word": {"sentence": common_word}
+    }]
+        
     response_string = json.dumps(response_data_entry)
-    #print(response_string)
     
     return response_string
 
