@@ -104,10 +104,12 @@ def find_pop_words(num_common_words=10, file_dir="../txt_files"): #by default se
     #Return words only, not their count, as we don't need this in any results
     return [word[0] for word in common_words], content_per_doc
 
-#TODO: find which documents each popular word appears in
+# Find which documents each popular word appears in
 def which_documents(content_per_doc, word):
-    return render_template('index.html')
+    hit_docs = [key for key, value in content_per_doc.items() if (word in value)]
+    return hit_docs
 
+# Find sentences a popular word appears in across all documents.
 def find_sentences(content_per_doc, pop_words):
 
     full_content = ' '.join(content_per_doc.values()) #Concat all text from docs with spaces between
