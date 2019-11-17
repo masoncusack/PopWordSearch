@@ -102,30 +102,27 @@ def find_pop_words(num_common_words=10, file_dir="../txt_files"): #by default se
 
     #TODO: return results and use in other processing functions, then wrap
     #Return words only, not their count, as we don't need this in any results
-    return [word[0] for word in common_words], full_content, content_per_doc
+    return [word[0] for word in common_words], content_per_doc
 
 #TODO: find which documents each popular word appears in
 def which_documents(content_per_doc, word):
     return render_template('index.html')
 
-#TODO: find sentences in which each popular word appears
-def find_sentences(full_content, pop_words):
+def find_sentences(content_per_doc, pop_words):
+
+    full_content = ' '.join(content_per_doc.values()) #Concat all text from docs with spaces between
 
     text_to_process = nlp(full_content) #TODO: need to do this globally
 
     sentences = list(text_to_process.sents)
 
-    #print("Total num sentences: " + str(len(sentences)))
-    #print(sentences)
+    hit_sentences = {}
 
+    #Associate sentences with their contained popular words
     for word in pop_words:
-        hit_sentences = [sent for sent in sentences if word in str(sent)]
-        #print("Found the following sentences containing popular word " + str(word) +" in the given content:")
-        #print(hit_sentences)
-        #print("Number of sentences found: " + str(len(hit_sentences)) + "\n")
+        hit_sentences[word] = [sent for sent in sentences if word in str(sent)]
 
-    #TODO: figure out return format
-    return True
+    return hit_sentences
 
 @app.route("/", methods=['GET', 'POST'])
 def handle_file_upload():
