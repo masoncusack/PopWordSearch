@@ -101,8 +101,23 @@ def which_documents(content_per_doc, word):
     return render_template('index.html')
 
 #TODO: find sentences in which each popular word appears
-def find_sentences(full_content, word):
-    return render_template('index.html')
+def find_sentences(full_content, pop_words):
+
+    text_to_process = nlp(full_content) #TODO: need to do this globally
+
+    sentences = list(text_to_process.sents)
+
+    print("Total num sentences: " + str(len(sentences)))
+    #print(sentences)
+
+    for word in pop_words:
+        hit_sentences = [sent for sent in sentences if word in str(sent)]
+        print("Found the following sentences containing popular word " + str(word) +" in the given content:")
+        print(hit_sentences)
+        print("Number of sentences found: " + str(len(hit_sentences)) + "\n")
+
+    #TODO: figure out return format
+    return True
 
 @app.route("/", methods=['GET', 'POST'])
 def handle_file_upload():
