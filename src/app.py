@@ -98,14 +98,14 @@ def find_pop_words(num_common_words=10, file_dir="../txt_files"): #by default se
 
     #TODO: return results and use in other processing functions, then wrap
     #Return words only, not their count, as we don't need this in any results
-    return [word[0] for word in common_words], content_per_doc, full_content
+    return [str(word[0]) for word in common_words], content_per_doc, full_content
 
 # Find which documents each popular word appears in
 def find_documents(content_per_doc, pop_words):
     hit_docs = {}
     for word in pop_words:
         #values of hit_docs are lists of documents for which the common word key is a part of the content
-        hit_docs[word] = [key for key, value in content_per_doc.items() if (word in value)]
+        hit_docs[word] = [str(key) for key, value in content_per_doc.items() if (word in value)]
     return hit_docs
 
 # Find which sentences a popular word appears in across all documents.
@@ -119,7 +119,7 @@ def find_sentences(full_content, pop_words):
 
     #Associate sentences with their contained popular words
     for word in pop_words:
-        hit_sentences[word] = [sent for sent in sentences if word in str(sent)] #Values are lists of sentences that associated word is in
+        hit_sentences[word] = [str(sent) for sent in sentences if word in str(sent)] #Values are lists of sentences that associated word is in
 
     return hit_sentences
 
@@ -147,6 +147,10 @@ def handle_file_upload():
             #Unzip all contained files to get txts
             unzip(zip_name=zipname, in_path=UPLOAD_FOLDER+zipname) #out_path has default
 
+            #TODO: build response for front end
+            
+            #1. Get common words across documents
+            
             #If the user submits a specific number of common words they want
             #TODO: protect against the case when num_common_words is negative
             if request.form['num_common_words'] is not None:
@@ -154,29 +158,46 @@ def handle_file_upload():
                 common_words, content_per_doc, full_content = find_pop_words(num_common_words=int(num_common_words))
             else:
                 common_words, content_per_doc, full_content = find_pop_words() #use default
-            
-            print("Most common words: " + str(common_words))
 
-            hit_sentences = find_sentences(full_content, common_words) #common_words are a set of keys for this dict
+            #2. Get the documents in which each word appears
             
-            print("Sentences with these words: " + str(hit_sentences))
-
             hit_docs = find_documents(content_per_doc, common_words)
+
+            #3. Get the sentences in which each word appears
+
+            hit_sentences = find_sentences(full_content, common_words)
+
+            response = ""
+
+            #4. Aggregate into response object (key for each result dict is the common word itself)
+
+            '''Example result entry'''
+            print("Common word: ")
+            sought_word = common_words[0]
+            
+            print("\nDocuments where this word appears: ")
+            print(hit_docs[sought_word])
+
+            print("\nSentences where this word appears: ")
+            print(hit_sentences[sought_word])
+
+            #TODO: jsonify
+            
 
     return render_template('index.html')
 
 #Convert result to json for response (can be rendered in table on front end)
 #TODO: the below needs to be generated for each popular word
-def gen_response():
+def gen_response(common_word, hit_documents, hit_sentences):
     response_data_entry = {
         "Word(#)": {
-
+            common_word
         },
         "Documents": {
-            
+            hit_documents
         },
         "Sentences containing the word": {
-
+            hit_sentences
         }
     }
     
