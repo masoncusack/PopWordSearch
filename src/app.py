@@ -6,9 +6,6 @@ from flask import Flask, request, Response, flash, redirect, render_template
 from werkzeug.utils import secure_filename
 import shutil, os
 
-#TODO: setup.sh bash script that does e.g. python3 -m spacy download en (or whatever it was)
-#TODO: consider support for Mandarin Chinese or another language? (should be transferable)
-
 # Set host and port
 ADDRESS = '0.0.0.0'
 PORT = 8000

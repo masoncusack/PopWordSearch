@@ -10,8 +10,11 @@ The HTML form allows you to change the number of common words you look for. I.e.
 ## The approach
 
 We use spaCy's English language model to produce 3 functionalities:
+
 - Finding common words across documents, by tokenizing text and removing stop words such as 'and', 'the', etc., in order to produce more valuable results (`find_pop_words`)
+
 - Finding all documents in which each of these common words appears, maintaining a dictionary of common words-to-filenames (`find_documents`)
+
 - Finding all sentences in which each common word appears, maintaining a dictionary of common words-to-sentences (`find_sentences`)
 
 The user can choose how many common words to find, and how many example sentences the app should return for each.
@@ -104,6 +107,6 @@ You can then use the app by going to [localhost:8000](http://localhost:8000) in 
 
 ### Use the deployed version
 
-I've deployed such a Docker image from a private registry to a public endpoint (thus, the source code is hidden): https://popwordsearch.azurewebsites.net. 
+I've deployed such a Docker image from a private registry to a public endpoint (thus, the source code is hidden), at https://popwordsearch.azurewebsites.net. 
 
 This is the easiest way to try the app out.
