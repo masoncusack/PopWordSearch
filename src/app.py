@@ -70,10 +70,8 @@ def find_pop_words(num_common_words=10, file_dir="../txt_files"): #by default se
 
     for i in range(len(filepaths)):
         filename = f_names[i]
-        #print("Filename = " + str(filename))
-        #print("Filepath = " + str(filepaths[i]))
         doc = open(filepaths[i])
-        plaintext = doc.read().replace('\n', '').lower() # Strip out newline characters common in .txts and turn to lowercase to avoid token duplication
+        plaintext = doc.read().replace('\n', ' ').lower() # Strip out newline characters common in .txts and turn to lowercase to avoid token duplication
         
         #Add content as value to dict with filename as key
         content_per_doc[filename] = plaintext
@@ -88,12 +86,12 @@ def find_pop_words(num_common_words=10, file_dir="../txt_files"): #by default se
     # Find words/"tokens", removing stop words
     words = [str(token.text) for token in text_to_process if token.is_punct != True and token.is_stop != True]
 
-    # Find the n most common words
+    # Find the top n most common words
     num_words = Counter(words)
     common_words = num_words.most_common(num_common_words)
 
-    #TODO: return results and use in other processing functions, then wrap
     #Return words only, not their count, as we don't need this in any results
+    #As the first step in processing, this function also processes txt content to provide input for other functions
     return [str(word[0]) for word in common_words], content_per_doc, full_content
 
 # Find which documents each popular word appears in
