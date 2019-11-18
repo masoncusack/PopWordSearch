@@ -5,7 +5,7 @@ Simple flask-based NLP service utilising spaCy to find the most popular words wi
 
 This is a Flask app serving a basic HTML frontend which allows you to upload a .zip like the one provided, analyses the content of text files therein, and returns the most common words, the documents they appear in, and a selection of sentences within those documents where the words appear. 
 
-The HTML form allows you to change the number of common words you look for. I.e. the 10 most common versus the 5 most common.
+The HTML form allows you to change the number of common words you look for. I.e. the 10 most common versus the 5 most common, and also how many example sentences to return, which
 
 ## The approach
 
@@ -13,7 +13,22 @@ Parameterised HTML was used due to the lack of time to build a proper front end.
 
 ## In the future...
 
+I'd like to:
+
+- Do more error handling
+- Write unittests which report out to the CI/CD process in GitHub/Azure Devops
+
+
 ## Running the app
+
+### Prerequisites
+
+- Python 3 installed (3.7+)
+- python3-pip (pip3 package manager)
+
+### Optional/useful
+
+- Docker
 
 ### If wanting to run locally
 
@@ -77,13 +92,3 @@ docker run -t -p 8000:8000 popwordsearch:demo
 
 
 You can then use the app by going to [localhost:8000](http://localhost:8000) in your browser.
-
-
-### Prerequisites
-
-- Python 3 installed (3.7+)
-- python3-pip (pip3 package manager)
-
-### Useful
-
-- Docker
