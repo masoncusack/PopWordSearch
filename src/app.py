@@ -125,7 +125,10 @@ def find_sentences(full_content, pop_words):
 
 @app.route("/", methods=['GET', 'POST'])
 def handle_file_upload():
-    if request.method == 'POST':
+    if request.method == 'GET':
+        return render_template('index.html')
+
+    elif request.method == 'POST':
 
         if 'zip' not in request.files:
             flash('No file uploaded/found')
@@ -167,9 +170,7 @@ def handle_file_upload():
 
             hit_sentences = find_sentences(full_content, common_words)
 
-            response = ""
-
-            #4. Aggregate into response object (key for each result dict is the common word itself)
+            #4. Return and render results
 
             #Example result entry
             print("Common word: ")
@@ -182,28 +183,60 @@ def handle_file_upload():
             print("\nSentences where this word appears: ")
             print(hit_sentences[sought_word])
             
-            '''TODO: jsonify
-            for word in common_words:
-                response = gen_response(word, hit_docs[word], hit_sentences[word]) 
-                print(response)
-            '''
-            
+            #Render results
+            result_table = gen_result_table(common_words, hit_docs, hit_sentences)
+            return param_html(result_table)
 
-    return render_template('index.html')
+#Parameterise html to display results because I don't have time to build a front end
+def param_html(result_table):
+    return('<!DOCTYPE html>'+
+            '<html style="zoom:200%; max-width:500px; margin:auto">'
+            '<head>'+
+                '<meta charset="UTF-8">'+
+                '<title>Natural language analysis</title>'+
+            '</head>'+
+            '<body style="text-align:center">'+
+                '<h1 style="text-align:center">Upload a .zip folder of .txt files for analysis</h1>'+
+                '<br>'+
+                    '<form method="post" action="/" enctype="multipart/form-data">'+
+                        '<input type="file" name="zip" id="zip">'+
+                        '<br/><br/>'+
+                        '<label for="lfname">Number of common words to find:</label>'+
+                        '<input type=number name="num_common_words" id="num_common_words" value="10">'+
+                        '<br/><br/>'+
+                        '<input type="submit" value="Upload"></form>'+
+                        '<br/><br/><hr/>'+
+                    '</form>'+
+                '<h3 style="color:black">Results: </h3>'+
+                        result_table+
+                '</h3>'+
+            '</body>'+
+            '</html>')
+
 
 #Convert result to json for response (can be rendered in table on front end)
 #TODO: the below needs to be generated for each popular word
-def gen_response(common_word, hit_documents, hit_sentences):
+def gen_result_table(common_words, hit_docs, hit_sentences):
     
-    response_data_entry = [{
-        "word(#)": {"word": common_word},
-        "Documents": {"document": common_word},
-        "Sentences containing the word": {"sentence": common_word}
-    }]
-        
-    response_string = json.dumps(response_data_entry)
-    
-    return response_string
+    entries = '' #Initially no classifications
+
+    for word in common_words:
+        entries+=('<tr>'+
+                    '<td>'+word+'</td>'+
+                    '<td>'+', '.join(hit_docs[word])+'</td>'+
+                    '<td>'+'<br/> '.join(hit_sentences[word][:3])+'</td>'+
+                '</tr>')
+        #New row for each common word
+
+    table = ('<table style="margin-right:auto; margin-left:auto; width:400px;" border="1">'+
+                '<tr>'+
+                    '<th>Word(#)</th>'+
+                    '<th>Documents containing this word</th>'+
+                    '<th>Some sentences containing this word</th>'+
+                '</tr>'+entries+
+            '</table>') #If somehow no results, will just render empty table
+            
+    return table
 
 if __name__ == '__main__':
     app.run(host=ADDRESS, port=PORT) #Run over http for sake of ease (not secure for production)
