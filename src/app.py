@@ -174,7 +174,7 @@ def handle_file_upload():
 
             #4. Return and render results
 
-            #Example result entry
+            '''Example result entry
             print("Common word: ")
             sought_word = common_words[1]
             print(sought_word)
@@ -184,7 +184,8 @@ def handle_file_upload():
 
             print("\nSentences where this word appears: ")
             print(hit_sentences[sought_word])
-            
+            '''
+
             #Render results
             result_table = gen_result_table(common_words, hit_docs, hit_sentences, num_sentences)
             return param_html(result_table)
