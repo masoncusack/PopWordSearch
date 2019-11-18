@@ -2,7 +2,7 @@ import spacy
 from collections import Counter
 import json
 import zipfile
-from flask import Flask, request, flash, redirect, render_template
+from flask import Flask, request, redirect, render_template
 from werkzeug.utils import secure_filename
 import shutil, os
 
@@ -127,12 +127,12 @@ def handle_file_upload():
     elif request.method == 'POST':
 
         if 'zip' not in request.files:
-            #flash('No file uploaded/found')
+            print('No file uploaded/found')
             return redirect(request.url)
         #else
         files = request.files['zip']
         if files.filename =='':
-            #flash('Filename missing')
+            print('Filename missing')
             return redirect(request.url)
         if files and allowed_file(files.filename): #check that is not None
             zipname = secure_filename(files.filename)
@@ -186,7 +186,7 @@ def handle_file_upload():
             #Render results
             result_table = gen_result_table(common_words, hit_docs, hit_sentences, num_sentences)
             return param_html(result_table)
-            
+
 #Parameterise html to display results because I don't have time to build a front end
 def param_html(result_table):
     return('<!DOCTYPE html>'+
