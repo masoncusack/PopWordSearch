@@ -11,8 +11,11 @@
             <form method="post" action="/" enctype="multipart/form-data">
                 <input type="file" name="zip" id="zip">
                 <br/><br/>
-                <label for="lfname">Number of common words to find:</label> 
+                <label for="num_common_words">Number of common words to find:</label> 
                 <input type=number name="num_common_words" id="num_common_words" value="10">
+                <br/><br/>
+                <label for="num_sentences">Number of sentence examples to return:</label> 
+                <input type=number name="num_sentences" id="num_sentences" value="3">
                 <br/><br/>
                 <input type="submit" value="Upload"></form>
                 <br/><br/><hr/>
@@ -22,7 +25,7 @@
                 <tr>
                     <th style="color:black">Word(#)</th>
                     <th style="color:black">Documents</th>
-                    <th style="color:black">Sentences containing the word</th>
+                    <th style="color:black">Some sentences containing the word</th>
                 </tr>
             </table>
         </h3>

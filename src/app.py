@@ -6,7 +6,6 @@ from flask import Flask, request, Response, flash, redirect, render_template
 from werkzeug.utils import secure_filename
 import shutil, os
 
-#TODO: write tests and consider CI/CD. In fact, consider deploying this as a site/API
 #TODO: setup.sh bash script that does e.g. python3 -m spacy download en (or whatever it was)
 #TODO: consider support for Mandarin Chinese or another language? (should be transferable)
 
@@ -162,6 +161,9 @@ def handle_file_upload():
             else:
                 common_words, content_per_doc, full_content = find_pop_words() #use default
 
+            #Number of sentence examples to return according to form
+            num_sentences = request.form['num_sentences']
+
             #2. Get the documents in which each word appears
             
             hit_docs = find_documents(content_per_doc, common_words)
@@ -184,7 +186,7 @@ def handle_file_upload():
             print(hit_sentences[sought_word])
             
             #Render results
-            result_table = gen_result_table(common_words, hit_docs, hit_sentences)
+            result_table = gen_result_table(common_words, hit_docs, hit_sentences, num_sentences)
             return param_html(result_table)
 
 #Parameterise html to display results because I don't have time to build a front end
@@ -204,6 +206,9 @@ def param_html(result_table):
                         '<label for="lfname">Number of common words to find:</label>'+
                         '<input type=number name="num_common_words" id="num_common_words" value="10">'+
                         '<br/><br/>'+
+                        '<label for="num_sentences">Number of sentence examples to return:</label>'+
+                        '<input type=number name="num_sentences" id="num_sentences" value="3">'+
+                        '<br/><br/>'+
                         '<input type="submit" value="Upload"></form>'+
                         '<br/><br/><hr/>'+
                     '</form>'+
@@ -216,7 +221,7 @@ def param_html(result_table):
 
 #Convert result to json for response (can be rendered in table on front end)
 #TODO: the below needs to be generated for each popular word
-def gen_result_table(common_words, hit_docs, hit_sentences):
+def gen_result_table(common_words, hit_docs, hit_sentences, num_sentences):
     
     entries = '' #Initially no classifications
 
@@ -224,7 +229,7 @@ def gen_result_table(common_words, hit_docs, hit_sentences):
         entries+=('<tr>'+
                     '<td>'+word+'</td>'+
                     '<td>'+', '.join(hit_docs[word])+'</td>'+
-                    '<td>'+'<br/> '.join(hit_sentences[word][:3])+'</td>'+
+                    '<td>'+'<br/> '.join(hit_sentences[word][:int(num_sentences)])+'</td>'+
                 '</tr>')
         #New row for each common word
 
