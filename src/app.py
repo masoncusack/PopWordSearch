@@ -194,7 +194,7 @@ def param_html(result_table):
             '<head>'+
                 '<link rel="stylesheet" href="/static/style.css"/>'+
                 '<meta charset="UTF-8">'+
-                '<title>Natural language analysis</title>'+
+                '<title>Pop Word Search: natural language analysis of txt files</title>'+
             '</head>'+
             '<body style="text-align:center">'+
                 '<h1 style="text-align:center">Upload a .zip folder of .txt files for analysis</h1>'+
