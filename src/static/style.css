@@ -1,0 +1,21 @@
+body {
+    font-family: 'Courier New', Courier, monospace;
+    background: cyan;
+    color: black;
+}
+
+hr {
+    border: 1px dashed black;
+}
+
+table {
+    border-collapse: collapse;
+    width: 500px;
+    margin-right:auto;
+    margin-left:auto;
+}
+  
+table, th, td {
+    border: 2px solid black;
+}
+  

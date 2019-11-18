@@ -192,6 +192,7 @@ def param_html(result_table):
     return('<!DOCTYPE html>'+
             '<html style="zoom:200%; max-width:500px; margin:auto">'
             '<head>'+
+                '<link rel="stylesheet" href="/static/style.css"/>'+
                 '<meta charset="UTF-8">'+
                 '<title>Natural language analysis</title>'+
             '</head>'+
@@ -227,11 +228,11 @@ def gen_result_table(common_words, hit_docs, hit_sentences, num_sentences):
         entries+=('<tr>'+
                     '<td>'+word+'</td>'+
                     '<td>'+', '.join(hit_docs[word])+'</td>'+
-                    '<td>'+'<br/> '.join(hit_sentences[word][:int(num_sentences)])+'</td>'+
+                    '<td>'+'<br/><br/> '.join(hit_sentences[word][:int(num_sentences)])+'</td>'+
                 '</tr>')
         #New row for each common word
 
-    table = ('<table style="margin-right:auto; margin-left:auto; width:400px;" border="1">'+
+    table = ('<table>'+
                 '<tr>'+
                     '<th>Word(#)</th>'+
                     '<th>Documents containing this word</th>'+
