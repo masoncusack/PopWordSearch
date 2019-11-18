@@ -107,6 +107,6 @@ You can then use the app by going to [localhost:8000](http://localhost:8000) in 
 
 ### Use the deployed version
 
-I've deployed such a Docker image from a private registry to a public endpoint (thus, the source code is hidden), at https://popwordsearch.azurewebsites.net. 
+I've deployed such a Docker image from a private registry to a public endpoint (thus, the source code is hidden), at [https://popwordsearch.azurewebsites.net](https://popwordsearch.azurewebsites.net).
 
 This is the easiest way to try the app out.
