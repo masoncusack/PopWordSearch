@@ -105,89 +105,19 @@ def find_documents(content_per_doc, pop_words):
 # Find which sentences a popular word appears in across all documents.
 def find_sentences(full_content, pop_words):
 
-    text_to_process = nlp(full_content) #TODO: should we do this globally?
+    text_to_process = nlp(full_content)
 
     sentences = list(text_to_process.sents)
 
     hit_sentences = {}
 
-    #Associate sentences with their contained popular words
+    #Associate sentences with their contained common words
     for word in pop_words:
         hit_sentences[str(word).lower()] = [str(sent) for sent in sentences if word in str(sent)] #Values are lists of sentences that associated word is in
 
     return hit_sentences
 
-@app.route("/", methods=['GET', 'POST'])
-def handle_file_upload():
-    if request.method == 'GET':
-        return render_template('index.html')
-
-    elif request.method == 'POST':
-
-        if 'zip' not in request.files:
-            print('No file uploaded/found')
-            return redirect(request.url)
-        #else
-        files = request.files['zip']
-        if files.filename =='':
-            print('Filename missing')
-            return redirect(request.url)
-        if files and allowed_file(files.filename): #check that is not None
-            zipname = secure_filename(files.filename)
-
-            #Ensure there is an uploads folder
-            create_dir(UPLOAD_FOLDER)
-            
-            #Save files locally for processing
-            files.save(os.path.join(UPLOAD_FOLDER, zipname))
-            
-            #Unzip all contained files to get txts
-            unzip(zip_name=zipname, in_path=UPLOAD_FOLDER+zipname) #out_path has default
-
-            #TODO: build response for front end
-            
-            #1. Get common words across documents
-            
-            #If the user submits a specific number of common words they want
-            #TODO: protect against the case when num_common_words is negative
-            if request.form['num_common_words'] is not None:
-                num_common_words = request.form['num_common_words']
-                common_words, content_per_doc, full_content = find_pop_words(num_common_words=int(num_common_words))
-            else:
-                common_words, content_per_doc, full_content = find_pop_words() #use default
-
-            #Number of sentence examples to return according to form
-            num_sentences = request.form['num_sentences']
-
-            #2. Get the documents in which each word appears
-            
-            hit_docs = find_documents(content_per_doc, common_words)
-
-            #3. Get the sentences in which each word appears
-
-            hit_sentences = find_sentences(full_content, common_words)
-
-            #4. Return and render results
-
-            '''Example result entry
-            print("Common word: ")
-            sought_word = common_words[1]
-            print(sought_word)
-            
-            print("\nDocuments where this word appears: ")
-            print(hit_docs[sought_word])
-
-            print("\nSentences where this word appears: ")
-            print(hit_sentences[sought_word])
-            '''
-
-            #Render results
-            result_table = gen_result_table(common_words, hit_docs, hit_sentences, num_sentences)
-            return param_html(result_table)
-        else:
-            return redirect(request.url)
-
-#Parameterise html to display results because I don't have time to build a front end
+#Parameterise html to display results because I lack the time necessary to build a front end
 def param_html(result_table):
     return('<!DOCTYPE html>'+
             '<html style="zoom:200%; max-width:500px; margin:auto">'
@@ -218,8 +148,7 @@ def param_html(result_table):
             '</html>')
 
 
-#Convert result to json for response (can be rendered in table on front end)
-#TODO: the below needs to be generated for each popular word
+#Generate table of results as requested, to insert into html
 def gen_result_table(common_words, hit_docs, hit_sentences, num_sentences):
     
     entries = '' #Initially no classifications
@@ -241,6 +170,75 @@ def gen_result_table(common_words, hit_docs, hit_sentences, num_sentences):
             '</table>') #If somehow no results, will just render empty table
             
     return table
+
+@app.route("/", methods=['GET', 'POST'])
+def handle_file_upload():
+    if request.method == 'GET':
+        return render_template('index.html')
+
+    elif request.method == 'POST':
+
+        if 'zip' not in request.files:
+            print('No file uploaded/found')
+            return redirect(request.url) #disallow - prevent app failure
+        #else
+        files = request.files['zip']
+        if files.filename =='':
+            print('Filename missing')
+            return redirect(request.url)
+        if files and allowed_file(files.filename): # not none and file type is ok
+            zipname = secure_filename(files.filename)
+
+            #Create a place for uploads
+            create_dir(UPLOAD_FOLDER)
+            
+            #Save files locally for processing
+            files.save(os.path.join(UPLOAD_FOLDER, zipname))
+            
+            #Unzip all contained files to get txts
+            unzip(zip_name=zipname, in_path=UPLOAD_FOLDER+zipname) #out_path has default
+
+            #build response for front end
+            
+            #1. Get common words across documents
+            
+            #If the user submits a specific number of common words they want
+            if request.form['num_common_words'] is not None:
+                num_common_words = request.form['num_common_words']
+                common_words, content_per_doc, full_content = find_pop_words(num_common_words=int(num_common_words))
+            else:
+                common_words, content_per_doc, full_content = find_pop_words() #use default
+
+            #Number of sentence examples to return according to form
+            num_sentences = request.form['num_sentences']
+
+            #2. Get the documents in which each word appears
+            
+            hit_docs = find_documents(content_per_doc, common_words)
+
+            #3. Get the sentences in which each word appears
+
+            hit_sentences = find_sentences(full_content, common_words)
+
+            #4. Return and render results
+
+            '''See example result entry
+            print("Common word: ")
+            sought_word = common_words[1]
+            print(sought_word)
+            
+            print("\nDocuments where this word appears: ")
+            print(hit_docs[sought_word])
+
+            print("\nSentences where this word appears: ")
+            print(hit_sentences[sought_word])
+            '''
+
+            #Render results
+            result_table = gen_result_table(common_words, hit_docs, hit_sentences, num_sentences)
+            return param_html(result_table)
+        else:
+            return redirect(request.url)
 
 if __name__ == '__main__':
     app.run(host=ADDRESS, port=PORT) #Run over http for sake of ease (not secure for production)
