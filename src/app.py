@@ -186,6 +186,8 @@ def handle_file_upload():
             #Render results
             result_table = gen_result_table(common_words, hit_docs, hit_sentences, num_sentences)
             return param_html(result_table)
+        else:
+            return redirect(request.url)
 
 #Parameterise html to display results because I don't have time to build a front end
 def param_html(result_table):

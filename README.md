@@ -27,7 +27,7 @@ Parameterised HTML was used as a makeshift frontend due to the lack of time to b
 
 I'd like to:
 
-- Do more messaging - the current version of the app gives no instruction when, for example, the user fails to upload a .zip. A mature frontend can better model dynamic state, to reject certain inputs and give warnings in a way that doesn't lead to failures, and instructs users.
+- Better messaging - the current version of the app gives no instruction when, for example, the user fails to upload a .zip. A mature frontend can better model dynamic state, to reject certain inputs and give warnings in a way that doesn't lead to failures, and instructs users.
 - Write unittests which report out to the CI/CD process in GitHub/Azure Devops using a JUnit reporting library like [xmlrunner](https://pypi.org/project/xmlrunner/).
 - Exploring other data structures and approaches for processing text to make this faster and more memory efficient, particularly as the number of files uploaded increases.
 - As part of additional front-end work, explore better ways of visualising the returned data. Large numbers of sentence examples are particularly difficult to display neatly and readably in a table structure.
