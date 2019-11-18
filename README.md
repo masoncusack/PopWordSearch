@@ -27,7 +27,7 @@ Parameterised HTML was used as a makeshift frontend due to the lack of time to b
 
 I'd like to:
 
-- Better messaging - the current version of the app gives no instruction when, for example, the user fails to upload a file or uploads the wrong file type. A mature frontend can better model dynamic state, to reject certain inputs and give warnings in a way that properly instructs users.
+- Provide better messaging - the current version of the app gives no instruction when, for example, the user fails to upload a file or uploads the wrong file type. A mature frontend can better model dynamic state, to reject certain inputs and give warnings in a way that properly instructs users.
 - Write unittests which report out to the CI/CD process in GitHub/Azure Devops using a JUnit reporting library like [xmlrunner](https://pypi.org/project/xmlrunner/).
 - Exploring other data structures and approaches for processing text to make this faster and more memory efficient, particularly as the number of files uploaded increases.
 - As part of additional front-end work, explore better ways of visualising the returned data. Large numbers of sentence examples are particularly difficult to display neatly and readably in a table structure.
@@ -104,10 +104,12 @@ docker build -t popwordsearch:demo .
 docker run -t -p 8000:8000 popwordsearch:demo
 ```
 
+Running `setup_and_run_docker.sh` will also do this for you.
+
 You can then use the app by going to [localhost:8000](http://localhost:8000) in your browser.
 
 ### Use the deployed version
 
 I've deployed such a Docker image from a private registry to a public endpoint (thus, the source code is hidden), at [https://popwordsearch.azurewebsites.net](https://popwordsearch.azurewebsites.net).
 
-This is the easiest way to try the app out.
+This is the easiest way to try the app out, and besides that serves to demonstrate that I know how to do cloud deployment of an app like this.
