@@ -1,6 +1,8 @@
 # PopWordSearch
 Simple flask-based NLP service utilising [spaCy](https://spacy.io) to find the most popular words within texts and retrieve the sentences they originate from.
 
+![A screenshot of the application to demonstrate the interface it serves.](.github/PREVIEW.png)
+
 ## General
 
 This is a Flask app serving a basic HTML frontend which allows you to upload a .zip like the one provided (test-files.zip), analyses the content of text files therein, and returns the most common words, the documents they appear in, and a selection of sentences within the documents where common words appear.
