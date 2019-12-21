@@ -21,17 +21,7 @@ The user can choose how many common words to find, and how many example sentence
 
 This could easily be expanded to support documents in German, French, Greek, and more languages, by utilising [spaCy's other language models](https://spacy.io/usage/models), and [language detection](https://spacy.io/universe/project/spacy-langdetect).
 
-Parameterised HTML was used as a makeshift frontend due to the lack of time to build out a more elaborate one. I do not class myself as proficient in front end development, and would be happy to discuss the many better ideas for a production scenario. I would argue the production of a suitable and robust front end constitutes an additional project.
-
-## In the future...
-
-I'd like to:
-
-- Provide better messaging - the current version of the app gives no instruction when, for example, the user fails to upload a file or uploads the wrong file type. A mature frontend can better model dynamic state, to reject certain inputs and give warnings in a way that properly instructs users.
-- Write unittests which report out to the CI/CD process in GitHub/Azure Devops using a JUnit reporting library like [xmlrunner](https://pypi.org/project/xmlrunner/).
-- Exploring other data structures and approaches for processing text to make this faster and more memory efficient, particularly as the number of files uploaded increases.
-- As part of additional front-end work, explore better ways of visualising the returned data. Large numbers of sentence examples are particularly difficult to display neatly and readably in a table structure.
-- Processing txts on the fly, rather than relying on temporarily uploading all files to the server, then processing the contents of the upload directory.
+Parameterised HTML was used as a makeshift frontend due to the lack of time to build out a more elaborate one.
 
 ## Running the app
 
@@ -107,9 +97,3 @@ docker run -t -p 8000:8000 popwordsearch:demo
 Running `setup_and_run_docker.sh` will also do this for you.
 
 You can then use the app by going to [localhost:8000](http://localhost:8000) in your browser.
-
-### Use the deployed version
-
-I've deployed such a Docker image from a private registry to a public endpoint (thus, the source code is hidden), at [https://popwordsearch.azurewebsites.net](https://popwordsearch.azurewebsites.net).
-
-This is the easiest way to try the app out, and besides that serves to demonstrate that I know how to do cloud deployment of an app like this.
