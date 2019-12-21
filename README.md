@@ -3,7 +3,7 @@ Simple flask-based NLP service utilising [spaCy](https://spacy.io) to find the m
 
 ## General
 
-This is a Flask app serving a basic HTML frontend which allows you to upload a .zip like the one provided, analyses the content of text files therein, and returns the most common words, the documents they appear in, and a selection of sentences within the documents where common words appear.
+This is a Flask app serving a basic HTML frontend which allows you to upload a .zip like the one provided (test-files.zip), analyses the content of text files therein, and returns the most common words, the documents they appear in, and a selection of sentences within the documents where common words appear.
 
 The HTML form allows you to change the number of common words you look for. I.e. the 10 most common versus the 5 most common, and also how many example sentences to return.
 
@@ -21,7 +21,7 @@ The user can choose how many common words to find, and how many example sentence
 
 This could easily be expanded to support documents in German, French, Greek, and more languages, by utilising [spaCy's other language models](https://spacy.io/usage/models), and [language detection](https://spacy.io/universe/project/spacy-langdetect).
 
-Parameterised HTML was used as a makeshift frontend due to the lack of time to build out a more elaborate one.
+Parameterised HTML was used as a makeshift frontend due to the lack of time to build out a more elaborate one (this was built in a few hours over a few evenings as a simple POC for Spacy).
 
 ## Running the app
 

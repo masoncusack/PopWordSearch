@@ -1,6 +1,5 @@
 import spacy
 from collections import Counter
-import json
 import zipfile
 from flask import Flask, request, redirect, render_template
 from werkzeug.utils import secure_filename
@@ -71,8 +70,8 @@ def find_pop_words(num_common_words=10, file_dir="../txt_files"): #by default se
     for i in range(len(filepaths)):
         filename = f_names[i]
         doc = open(filepaths[i])
-        plaintext = doc.read().replace('\n', ' ').lower() # Strip out newline characters common in .txts and turn to lowercase to avoid token duplication
-        
+        plaintext = doc.read().replace('\n', ' ').replace('  ', ' ').lower() # Strip out newline esc sequences and double spaces common in .txts and turn to lowercase to avoid token duplication
+
         #Add content as value to dict with filename as key
         content_per_doc[filename] = plaintext
         
@@ -151,7 +150,7 @@ def param_html(result_table):
 #Generate table of results as requested, to insert into html
 def gen_result_table(common_words, hit_docs, hit_sentences, num_sentences):
     
-    entries = '' #Initially no classifications
+    entries = '' #Initially not result content
 
     for word in common_words:
         entries+=('<tr>'+
@@ -221,18 +220,6 @@ def handle_file_upload():
             hit_sentences = find_sentences(full_content, common_words)
 
             #4. Return and render results
-
-            '''See example result entry
-            print("Common word: ")
-            sought_word = common_words[1]
-            print(sought_word)
-            
-            print("\nDocuments where this word appears: ")
-            print(hit_docs[sought_word])
-
-            print("\nSentences where this word appears: ")
-            print(hit_sentences[sought_word])
-            '''
 
             #Render results
             result_table = gen_result_table(common_words, hit_docs, hit_sentences, num_sentences)
