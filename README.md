@@ -27,14 +27,16 @@ Parameterised HTML was used as a makeshift frontend due to the lack of time to b
 
 ### Prerequisites
 
-- Python 3 installed (3.7+)
+- Python 3 installed (3.7+)()
 - python3-pip (pip3 package manager)
+
+...`requirements.txt` will take care of the rest.
 
 ### Optional/useful
 
 - Docker
 
-### If wanting to run locally
+### Running locally
 
 In this case it may be sensible to set up a [virtualenv](https://docs.python.org/3/library/venv.html) to avoid installing required packages globally on your local system.
 
@@ -73,7 +75,7 @@ chmod +x setup_and_run_local.sh
 
 You can then use the app by going to [localhost:8000](http://localhost:8000) in your browser.
 
-### If wanting to use Docker 
+### Running using Docker
 
 If you have Docker installed, the Dockerfile in the repo root will allow you to build a lightweight, deployment-ready Python image with all requirements installed. 
 
